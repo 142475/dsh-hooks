@@ -12,6 +12,7 @@
 import { chmodSync, existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
+import { detectProfile } from './dry-run.js'
 import YAML from 'yaml'
 import type { registerApp } from '@larksuiteoapi/node-sdk'
 import { run as notifyRun } from '../examples/notify-feishu.mjs'
@@ -199,7 +200,7 @@ export function mergePatchYaml(existingText: string): string {
  * profile patch, and send a welcome card to the scanning user.
  */
 export async function runFeishuSetup(options: RunFeishuSetupOptions = {}): Promise<FeishuSetupResult> {
-  const profile = options.profile ?? 'web'
+  const profile = options.profile ?? detectProfile()
   const print = options.print ?? console.log
   const printErr = options.printErr ?? console.error
   const paths = options.paths ?? {}

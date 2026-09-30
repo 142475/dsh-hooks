@@ -13,7 +13,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http'
 import { createRequire } from 'node:module'
 import type { HookSpec } from './config.js'
 import type { HistorySink } from './history.js'
-import { applyMockFields, describeHook, evaluateHooks, MOCK_NUMERIC_FIELDS, mockContext, patchFilePath } from './dry-run.js'
+import { applyMockFields, describeHook, detectProfile, evaluateHooks, MOCK_NUMERIC_FIELDS, mockContext, patchFilePath } from './dry-run.js'
 import { isProfileNameValid } from './profile-path.js'
 import { createHookRunner, type HookRunner } from './runner.js'
 import { fireNotify, summarizeContext } from './notify.js'
@@ -290,6 +290,7 @@ export function createHookHandler(options: HookRoutesOptions) {  const { hooks, 
         OK({
           name: 'dsh-hooks',
           version,
+          profile: detectProfile(),
           hookCount: hooks.length,
           historyCount: records.length,
           hooks: describeHooks(hooks),
@@ -408,7 +409,7 @@ export function createHookHandler(options: HookRoutesOptions) {  const { hooks, 
         return
       }
       const body = payload as Record<string, unknown>
-      const profile = typeof body.profile === 'string' && body.profile.trim() !== '' ? body.profile.trim() : 'web'
+      const profile = typeof body.profile === 'string' && body.profile.trim() !== '' ? body.profile.trim() : detectProfile()
       if (rejectBadProfile(res, profile)) return
       const resultMaxChars = typeof body.resultMaxChars === 'number' && Number.isFinite(body.resultMaxChars)
         ? body.resultMaxChars
@@ -518,7 +519,7 @@ export function createHookHandler(options: HookRoutesOptions) {  const { hooks, 
         return
       }
       const body = payload as Record<string, unknown>
-      const profile = typeof body.profile === 'string' && body.profile.trim() !== '' ? body.profile.trim() : 'web'
+      const profile = typeof body.profile === 'string' && body.profile.trim() !== '' ? body.profile.trim() : detectProfile()
       if (rejectBadProfile(res, profile)) return
       const wireHooks = body.hooks
       if (!Array.isArray(wireHooks)) {
@@ -552,7 +553,7 @@ export function createHookHandler(options: HookRoutesOptions) {  const { hooks, 
         return
       }
       const body = (typeof payload === 'object' && payload !== null ? payload : {}) as Record<string, unknown>
-      const profile = typeof body.profile === 'string' && body.profile.trim() !== '' ? body.profile.trim() : 'web'
+      const profile = typeof body.profile === 'string' && body.profile.trim() !== '' ? body.profile.trim() : detectProfile()
       if (rejectBadProfile(res, profile)) return
       const removeHooks = body.removeHooks === true
       // Abort any in-flight scan session first.

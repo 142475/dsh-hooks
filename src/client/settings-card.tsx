@@ -200,7 +200,7 @@ export function HooksSettingsCard(_props: object): ReactNode {
 
   // Feishu connect flow.
   const [feishu, setFeishu] = useState<FeishuStatusInfo | null>(null)
-  const [profile, setProfile] = useState(() => loadStored('dsh-hooks.profile', 'web'))
+  const [profile, setProfile] = useState(() => loadStored('dsh-hooks.profile', ''))
   const [setupTruncate, setSetupTruncate] = useState(String(DEFAULT_TRUNCATE))
   const [truncateDraft, setTruncateDraft] = useState<string | null>(null)
   const [configMessage, setConfigMessage] = useState<{ ok: boolean; text: string } | null>(null)
@@ -315,7 +315,7 @@ export function HooksSettingsCard(_props: object): ReactNode {
     setCountdown(null)
     const parsed = Number(setupTruncate)
     const result = await postFeishuSetup(
-      profile.trim() !== '' ? profile.trim() : 'web',
+      profile.trim(),
       Number.isFinite(parsed) ? parsed : undefined,
     )
     if (!result.ok) {
@@ -369,7 +369,7 @@ export function HooksSettingsCard(_props: object): ReactNode {
     if (!window.confirm('确定断开飞书连接？将删除本机凭据文件。')) return
     const removeHooks = window.confirm('同时从 cordis.patch.yml 移除飞书通知 hooks？\n（推荐移除，否则这些 hook 每次触发都会失败）')
     setFeishuError(null)
-    const result = await postFeishuDisconnect(profile.trim() !== '' ? profile.trim() : 'web', removeHooks)
+    const result = await postFeishuDisconnect(profile.trim(), removeHooks)
     if (!result.ok) setFeishuError(result.error ?? '断开失败')
     else setConfigMessage({ ok: true, text: result.message ?? '已断开' })
     void refresh()
@@ -482,7 +482,7 @@ export function HooksSettingsCard(_props: object): ReactNode {
         return
       }
     }
-    const result = await postHooksSave(profile.trim() !== '' ? profile.trim() : 'web', wire)
+    const result = await postHooksSave(profile.trim(), wire)
     if (!result.ok) {
       setSaveMessage({ ok: false, text: result.error ?? '保存失败' })
       return
@@ -763,7 +763,7 @@ export function HooksSettingsCard(_props: object): ReactNode {
                       setProfile(e.target.value)
                       storeValue('dsh-hooks.profile', e.target.value)
                     }}
-                    placeholder="web"
+                    placeholder="自动（当前 profile）"
                   />
                 </label>
                 <label className="dh-field dh-field-narrow">
@@ -817,7 +817,7 @@ export function HooksSettingsCard(_props: object): ReactNode {
                     setProfile(e.target.value)
                     storeValue('dsh-hooks.profile', e.target.value)
                   }}
-                  placeholder="web"
+                  placeholder="自动（当前 profile）"
                 />
               </label>
             </div>

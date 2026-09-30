@@ -26,6 +26,12 @@ export declare function describeOutcome(record: Omit<HookRunRecord, 'ts'>): stri
  */
 export declare function patchFilePath(profile: string): string;
 /**
+ * Profile this process serves. DSH passes the profile directory on the command
+ * line (`…/.dsh/profiles/<name> …`), so the desktop app resolves to `desktop`
+ * instead of the historical `web` default.
+ */
+export declare function detectProfile(argv?: readonly string[]): string;
+/**
  * Load and normalize the dsh-hooks config block from a profile's
  * cordis.patch.yml. Runs the block through the Config schema so match
  * regexes compile and invalid entries fail loudly.

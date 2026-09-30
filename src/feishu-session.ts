@@ -6,6 +6,7 @@
  * in the background and surface through `status()`.
  */
 import { runFeishuSetup, type FeishuSetupPaths } from './feishu.js'
+import { detectProfile } from './dry-run.js'
 
 export type FeishuSetupStatus = 'pending' | 'succeeded' | 'failed'
 
@@ -62,7 +63,7 @@ export function createFeishuSetupManager(deps: FeishuSetupManagerDeps = {}): Fei
   let controller: AbortController | null = null
   let cancelled = false
 
-  async function start(profile = 'web', options: { resultMaxChars?: number } = {}): Promise<FeishuSetupSnapshot> {
+  async function start(profile = detectProfile(), options: { resultMaxChars?: number } = {}): Promise<FeishuSetupSnapshot> {
     if (current?.status === 'pending') throw new Error(FEISHU_SETUP_BUSY)
 
     cancelled = false

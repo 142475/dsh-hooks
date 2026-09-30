@@ -58,6 +58,19 @@ export function patchFilePath(profile: string): string {
 }
 
 /**
+ * Profile this process serves. DSH passes the profile directory on the command
+ * line (`…/.dsh/profiles/<name> …`), so the desktop app resolves to `desktop`
+ * instead of the historical `web` default.
+ */
+export function detectProfile(argv: readonly string[] = process.argv): string {
+  for (const arg of argv) {
+    const match = /[\\/]profiles[\\/]([^\\/]+)/.exec(arg)
+    if (match) return match[1]
+  }
+  return 'web'
+}
+
+/**
  * Raw `dsh-hooks` config block from a profile's cordis.patch.yml. Throws on a
  * missing/unreadable file — callers that must stay lenient catch it.
  */
@@ -269,7 +282,7 @@ export interface DryRunOptions {
 
 /** Full dry-run report; optionally executes the matching hooks. */
 export async function runDryRun(options: DryRunOptions): Promise<{ matched: number; total: number }> {
-  const profile = options.profile ?? 'web'
+  const profile = options.profile ?? detectProfile()
   const print = options.print ?? console.log
   const { hooks, source } = loadHooks(profile, options.paths)
   const reasonKind = options.reason
